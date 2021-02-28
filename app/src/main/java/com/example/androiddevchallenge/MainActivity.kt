@@ -18,29 +18,51 @@ package com.example.androiddevchallenge
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import com.example.androiddevchallenge.ui.PetDetailsModel
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.viewmodels.PetDetailsViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(PetDetailsViewModel::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MyTheme {
-                MyApp()
+                val model by viewModel.model.observeAsState(PetDetailsModel())
+                MyApp(model)
             }
         }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        viewModel.getAToken()
     }
 }
 
 // Start building your app here!
 @Composable
-fun MyApp() {
+fun MyApp(model: PetDetailsModel) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        Column(Modifier.fillMaxWidth(1f)) {
+            Text(text = model.pet)
+        }
     }
 }
 
@@ -48,7 +70,7 @@ fun MyApp() {
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp()
+        MyApp(PetDetailsModel())
     }
 }
 
@@ -56,6 +78,6 @@ fun LightPreview() {
 @Composable
 fun DarkPreview() {
     MyTheme(darkTheme = true) {
-        MyApp()
+        MyApp(PetDetailsModel())
     }
 }
